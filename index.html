@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Interview Prep — by Sourabh Naneriya</title>
+<meta name="description" content="A compact, complete Java interview reference — OOP, Collections, Concurrency, Java 8+, JVM, Generics and more. Curated by Sourabh Naneriya.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e17;
+  --bg-alt:#0d1320;
+  --panel:#111827;
+  --panel-alt:#0e1520;
+  --border:#1f2b3d;
+  --border-soft:#182233;
+  --text:#dbe4ef;
+  --text-dim:#9aabc2;
+  --text-mute:#5f7089;
+  --teal:#2dd4bf;
+  --teal-dim:#134e4a;
+  --amber:#f5a623;
+  --amber-dim:#4a3410;
+  --violet:#a78bfa;
+  --violet-dim:#332756;
+  --red:#ff5f57;
+  --yellow:#ffbd2e;
+  --green:#28c93f;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --sans:'Inter', system-ui, sans-serif;
+  --radius:10px;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(45,212,191,.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, rgba(167,139,250,.07), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--teal); color:#04201c;}
+body.custom-cursor, body.custom-cursor a, body.custom-cursor button, body.custom-cursor .check, body.custom-cursor .chip{cursor:none;}
+
+/* ---------- custom cursor ---------- */
+.cursor-dot, .cursor-ring{
+  position:fixed; top:0; left:0; pointer-events:none; z-index:9999;
+  border-radius:50%; transform:translate(-50%,-50%);
+}
+.cursor-dot{
+  width:6px; height:6px; background:var(--teal); box-shadow:0 0 8px rgba(45,212,191,.8);
+  transition:opacity .2s ease;
+}
+.cursor-ring{
+  width:30px; height:30px; border:1.5px solid rgba(45,212,191,.45);
+  transition:width .18s ease, height .18s ease, border-color .18s ease, background .18s ease, opacity .2s ease;
+}
+.cursor-ring.hover{width:46px; height:46px; background:rgba(45,212,191,.1); border-color:var(--teal);}
+.cursor-ring::before, .cursor-ring::after{content:''; position:absolute; background:var(--teal);}
+.cursor-ring::before{top:50%; left:-6px; width:4px; height:1.5px; transform:translateY(-50%);}
+.cursor-ring::after{top:-6px; left:50%; width:1.5px; height:4px; transform:translateX(-50%);}
+
+/* ---------- ambient background graphics ---------- */
+.bg-decor{position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;}
+.bg-decor .grid{
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(45,212,191,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,212,191,.05) 1px, transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 70% 50% at 70% 0%, #000 30%, transparent 75%);
+}
+.glyph{
+  position:absolute; font-family:var(--mono); color:rgba(45,212,191,.14); font-weight:700;
+  animation:drift 14s ease-in-out infinite;
+}
+.glyph.violet{color:rgba(167,139,250,.14);}
+.glyph.amber{color:rgba(245,166,35,.13);}
+@keyframes drift{
+  0%, 100%{transform:translateY(0) rotate(0deg);}
+  50%{transform:translateY(-22px) rotate(4deg);}
+}
+@media (max-width:800px){.bg-decor{display:none;}}
+a{color:inherit;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:var(--bg-alt);}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-mute);}
+:focus-visible{outline:2px solid var(--teal); outline-offset:2px; border-radius:4px;}
+
+.wrap{max-width:1360px; margin:0 auto; padding:0 24px;}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  position:sticky; top:0; z-index:100;
+  background:rgba(10,14,23,.82);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border-soft);
+}
+.topbar-inner{
+  max-width:1360px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; gap:18px; justify-content:space-between;
+}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:.2px; white-space:nowrap;}
+.brand .dot-cluster{display:flex; gap:5px;}
+.brand .dot-cluster span{width:9px; height:9px; border-radius:50%; display:inline-block;}
+.brand .d1{background:var(--red);} .brand .d2{background:var(--yellow);} .brand .d3{background:var(--green);}
+.brand small{color:var(--text-mute); font-weight:500; font-size:11px;}
+
+.top-actions{display:flex; align-items:center; gap:14px;}
+.progress-pill{
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--mono); font-size:12px; color:var(--text-dim);
+  border:1px solid var(--border); padding:6px 12px; border-radius:100px;
+  background:var(--panel-alt);
+}
+.progress-ring{width:16px; height:16px; flex-shrink:0;}
+.progress-ring circle{fill:none; stroke-width:3;}
+.progress-ring .bg{stroke:var(--border);}
+.progress-ring .fg{stroke:var(--teal); stroke-linecap:round; transform-origin:center; transform:rotate(-90deg); transition:stroke-dashoffset .4s ease;}
+
+.burger{
+  display:none; width:38px; height:38px; border-radius:8px; border:1px solid var(--border);
+  background:var(--panel-alt); color:var(--text); cursor:pointer; align-items:center; justify-content:center;
+}
+.burger svg{width:18px; height:18px;}
+
+/* ---------- HERO ---------- */
+.hero{padding:64px 0 40px; position:relative; overflow:hidden;}
+.hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center;}
+.eyebrow{
+  font-family:var(--mono); font-size:12px; color:var(--teal); letter-spacing:.14em; text-transform:uppercase;
+  display:flex; align-items:center; gap:8px; margin-bottom:18px;
+}
+.eyebrow::before{content:''; width:18px; height:1px; background:var(--teal); display:inline-block;}
+.hero h1{
+  font-family:var(--mono); font-weight:800; font-size:clamp(32px,4.6vw,56px);
+  line-height:1.06; margin:0 0 18px; letter-spacing:-.02em;
+}
+.hero h1 .accent{color:var(--teal);}
+.hero p.lede{color:var(--text-dim); font-size:clamp(15px,1.6vw,18px); max-width:52ch; margin:0 0 28px;}
+.hero-stats{display:flex; gap:28px; flex-wrap:wrap; margin-bottom:32px;}
+.stat b{display:block; font-family:var(--mono); font-size:28px; font-weight:800; color:var(--text);}
+.stat span{font-size:12px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.08em;}
+.hero-ctas{display:flex; gap:12px; flex-wrap:wrap;}
+.btn{
+  font-family:var(--mono); font-weight:600; font-size:13.5px; padding:12px 20px; border-radius:8px;
+  border:1px solid transparent; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn-primary{background:var(--teal); color:#04201c; box-shadow:0 8px 24px -8px rgba(45,212,191,.5);}
+.btn-primary:hover{box-shadow:0 12px 28px -8px rgba(45,212,191,.65);}
+.btn-ghost{background:transparent; border-color:var(--border); color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+/* terminal card */
+.term{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
+  overflow:hidden; font-family:var(--mono);
+}
+.term-bar{
+  display:flex; align-items:center; gap:8px; padding:11px 14px; background:var(--panel-alt); border-bottom:1px solid var(--border-soft);
+}
+.term-bar .dots{display:flex; gap:7px;}
+.term-bar .dots span{width:11px; height:11px; border-radius:50%; display:inline-block;}
+.term-bar .t1{background:var(--red);} .term-bar .t2{background:var(--yellow);} .term-bar .t3{background:var(--green);}
+.term-bar .fname{margin-left:auto; font-size:11.5px; color:var(--text-mute);}
+.term-body{padding:22px 18px; min-height:230px; font-size:13.5px;}
+.term-line{white-space:pre-wrap; word-break:break-word; color:var(--text-dim); margin:0 0 4px;}
+.term-line .p{color:var(--teal);}
+.term-line .ok{color:var(--green);}
+.term-line .num{color:var(--amber);}
+.cursor{display:inline-block; width:8px; height:15px; background:var(--teal); vertical-align:-2px; animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ---------- LAYOUT ---------- */
+.layout{max-width:1360px; margin:0 auto; padding:8px 24px 100px; display:grid; grid-template-columns:250px 1fr; gap:36px; align-items:start;}
+.sidebar{
+  position:sticky; top:78px; max-height:calc(100vh - 100px); overflow:auto;
+  border:1px solid var(--border); border-radius:12px; background:var(--panel); padding:8px;
+}
+.sidebar-title{font-family:var(--mono); font-size:10.5px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.1em; padding:10px 12px 6px;}
+.file-link{
+  display:flex; align-items:center; gap:9px; padding:8px 12px; border-radius:7px; text-decoration:none;
+  color:var(--text-dim); font-family:var(--mono); font-size:13px; cursor:pointer; border:1px solid transparent;
+  transition:background .15s ease, color .15s ease;
+}
+.file-link:hover{background:var(--panel-alt); color:var(--text);}
+.file-link.active{background:var(--panel-alt); color:var(--text); border-color:var(--border-soft);}
+.file-link .fdot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+.file-link .fdot.T1{background:var(--amber);}
+.file-link .fdot.T2{background:var(--violet);}
+.file-link .fname{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.file-link .fcount{font-size:10.5px; color:var(--text-mute);}
+.file-link.active::before{content:'▸'; color:var(--teal); margin-right:-2px;}
+
+/* content header */
+.content-header{margin-bottom:22px;}
+.search-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;}
+.search-box{
+  flex:1; min-width:220px; display:flex; align-items:center; gap:9px;
+  background:var(--panel); border:1px solid var(--border); border-radius:9px; padding:11px 14px;
+}
+.search-box svg{width:16px; height:16px; color:var(--text-mute); flex-shrink:0;}
+.search-box input{
+  background:none; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:14px; width:100%;
+}
+.search-box input::placeholder{color:var(--text-mute);}
+.kbd{font-family:var(--mono); font-size:10.5px; color:var(--text-mute); border:1px solid var(--border); padding:2px 6px; border-radius:5px;}
+.filter-chips{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{
+  font-family:var(--mono); font-size:12px; padding:8px 14px; border-radius:100px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text-dim); cursor:pointer; transition:all .15s ease;
+}
+.chip:hover{color:var(--text);}
+.chip.active{background:var(--teal); color:#04201c; border-color:var(--teal); font-weight:600;}
+.results-note{font-family:var(--mono); font-size:12px; color:var(--text-mute); margin-top:10px;}
+.no-results{display:none; padding:60px 20px; text-align:center; color:var(--text-mute); font-family:var(--mono); font-size:13px;}
+
+/* topic sections */
+.topic{
+  border:1px solid var(--border); border-radius:12px; background:var(--panel); margin-bottom:20px; overflow:hidden;
+  opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease;
+  scroll-margin-top:90px;
+}
+.topic.in-view{opacity:1; transform:translateY(0);}
+.topic-head{
+  display:flex; align-items:center; gap:12px; padding:14px 18px; background:var(--panel-alt); border-bottom:1px solid var(--border-soft);
+}
+.topic-head .dots{display:flex; gap:6px; flex-shrink:0;}
+.topic-head .dots span{width:10px; height:10px; border-radius:50%;}
+.topic-head .num{
+  font-family:var(--mono); font-size:11px; color:var(--text-mute); border:1px solid var(--border); border-radius:5px; padding:2px 6px;
+  flex-shrink:0;
+}
+.topic-head h2{
+  font-family:var(--mono); font-size:15.5px; margin:0; font-weight:700; flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tier-badge{
+  font-family:var(--mono); font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:100px; letter-spacing:.03em; flex-shrink:0;
+}
+.tier-badge.T1{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,166,35,.35);}
+.tier-badge.T2{background:var(--violet-dim); color:var(--violet); border:1px solid rgba(167,139,250,.35);}
+.topic-progress{
+  height:3px; background:var(--border-soft); position:relative;
+}
+.topic-progress i{position:absolute; inset:0; width:0%; background:var(--teal); transition:width .35s ease;}
+
+.item{border-bottom:1px solid var(--border-soft);}
+.item:last-child{border-bottom:none;}
+.item-row{display:flex; align-items:flex-start; gap:12px; padding:15px 18px; cursor:pointer;}
+.item-row:hover{background:rgba(255,255,255,.015);}
+.check{
+  width:19px; height:19px; border-radius:5px; border:1.5px solid var(--border); flex-shrink:0; margin-top:2px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s ease;
+  background:var(--panel-alt);
+}
+.check svg{width:12px; height:12px; opacity:0; transition:opacity .15s ease; color:#04201c;}
+.item.done .check{background:var(--teal); border-color:var(--teal);}
+.item.done .check svg{opacity:1;}
+.item.done .q-text{color:var(--text-mute); text-decoration:line-through; text-decoration-color:var(--border);}
+.q-main{flex:1; min-width:0;}
+.q-text{font-weight:600; font-size:14.5px; color:var(--text); margin:0; padding-right:8px;}
+.chev{
+  width:9px; height:9px; border-right:1.6px solid var(--text-mute); border-bottom:1.6px solid var(--text-mute);
+  transform:rotate(45deg); transition:transform .2s ease; margin-top:6px; flex-shrink:0;
+}
+.item.open .chev{transform:rotate(-135deg); margin-top:9px;}
+.answer{
+  max-height:0; overflow:hidden; transition:max-height .32s ease;
+}
+.answer-inner{padding:0 18px 18px 49px; color:var(--text-dim); font-size:13.8px; line-height:1.65;}
+.answer-inner code{
+  font-family:var(--mono); background:var(--panel-alt); border:1px solid var(--border-soft); padding:1px 6px; border-radius:4px; font-size:.92em; color:var(--teal);
+}
+mark{background:rgba(245,166,35,.3); color:inherit; border-radius:3px; padding:0 1px;}
+
+/* stream operator reference */
+.stream-panel{padding:18px; border-top:1px solid var(--border-soft); background:var(--panel-alt);}
+.stream-panel-title{font-family:var(--mono); font-size:11px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.1em; margin:0 0 14px;}
+.stream-pipeline{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:12px;
+  margin-bottom:20px; padding:12px 14px; background:var(--panel); border:1px solid var(--border-soft); border-radius:8px;
+}
+.stream-pipeline .pstep{padding:6px 12px; border-radius:6px; white-space:nowrap;}
+.stream-pipeline .pstep.src{background:var(--panel-alt); color:var(--text-dim); border:1px dashed var(--border);}
+.stream-pipeline .pstep.inter{background:var(--violet-dim); color:var(--violet); border:1px solid rgba(167,139,250,.35);}
+.stream-pipeline .pstep.term{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,166,35,.35);}
+.stream-pipeline .arrow{color:var(--text-mute);}
+.op-cols{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media (max-width:640px){.op-cols{grid-template-columns:1fr;}}
+.op-col{border:1px solid var(--border-soft); border-radius:10px; padding:14px 16px; background:var(--panel);}
+.op-col-head{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+.op-col-head .swatch{width:9px; height:9px; border-radius:3px;}
+.op-col.inter .swatch{background:var(--violet);}
+.op-col.term .swatch{background:var(--amber);}
+.op-col-head b{font-family:var(--mono); font-size:13px;}
+.op-col-head small{color:var(--text-mute); font-size:11px; margin-left:auto; font-family:var(--mono);}
+.op-pills{display:flex; flex-wrap:wrap; gap:7px;}
+.op-pill{
+  font-family:var(--mono); font-size:11.5px; padding:5px 10px; border-radius:6px;
+  background:var(--panel-alt); border:1px solid var(--border-soft); color:var(--text-dim);
+}
+.op-note{margin:12px 0 0; font-size:12.5px; color:var(--text-mute); line-height:1.6;}
+
+/* footer */
+footer{border-top:1px solid var(--border-soft); background:var(--bg-alt); padding:44px 0 34px; margin-top:20px;}
+.footer-inner{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; align-items:center;}
+.footer-brand{font-family:var(--mono); font-weight:700; font-size:14px;}
+.footer-brand span{display:block; font-weight:500; color:var(--text-mute); font-size:12px; margin-top:4px;}
+.footer-links{display:flex; gap:20px; flex-wrap:wrap;}
+.footer-links a{font-family:var(--mono); font-size:12.5px; color:var(--text-dim); text-decoration:none; border-bottom:1px solid transparent; padding-bottom:2px;}
+.footer-links a:hover{color:var(--teal); border-color:var(--teal);}
+.footer-tag{font-family:var(--mono); font-size:11.5px; color:var(--text-mute); margin-top:18px; text-align:center;}
+
+/* mobile drawer */
+.overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:150;}
+.overlay.show{opacity:1; pointer-events:auto;}
+
+@media (max-width:940px){
+  .hero-grid{grid-template-columns:1fr; gap:36px;}
+  .burger{display:flex;}
+  .layout{grid-template-columns:1fr; padding-top:14px;}
+  .sidebar{
+    position:fixed; top:0; left:-290px; width:270px; height:100vh; max-height:none; z-index:200;
+    border-radius:0; transition:left .25s ease; padding-top:60px;
+  }
+  .sidebar.show{left:0; box-shadow:20px 0 40px rgba(0,0,0,.4);}
+  .progress-pill span.pp-label{display:none;}
+}
+@media (max-width:600px){
+  .wrap, .topbar-inner, .layout{padding-left:16px; padding-right:16px;}
+  .hero{padding:40px 0 28px;}
+  .hero-stats{gap:20px;}
+  .stat b{font-size:22px;}
+  .term-body{min-height:190px; padding:16px 14px; font-size:12.5px;}
+  .topic-head h2{font-size:14px;}
+  .answer-inner{padding-left:44px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="bg-decor" aria-hidden="true">
+  <div class="grid"></div>
+  <span class="glyph" style="top:12%; left:6%; font-size:38px; animation-delay:0s;">{ }</span>
+  <span class="glyph amber" style="top:22%; left:88%; font-size:30px; animation-delay:1.2s;">&lt;/&gt;</span>
+  <span class="glyph violet" style="top:62%; left:4%; font-size:26px; animation-delay:2.4s;">01</span>
+  <span class="glyph" style="top:78%; left:92%; font-size:34px; animation-delay:.6s;">;</span>
+  <span class="glyph violet" style="top:8%; left:48%; font-size:20px; animation-delay:1.8s;">λ</span>
+  <span class="glyph amber" style="top:46%; left:96%; font-size:22px; animation-delay:3s;">#</span>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="burger" id="burger" aria-label="Toggle topic list">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="brand">
+      <span class="dot-cluster"><span class="d1"></span><span class="d2"></span><span class="d3"></span></span>
+      JavaPrep<small>.dev</small>
+    </div>
+    <div class="top-actions">
+      <div class="progress-pill">
+        <svg class="progress-ring" viewBox="0 0 20 20">
+          <circle class="bg" cx="10" cy="10" r="8"></circle>
+          <circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.24" stroke-dashoffset="50.24"></circle>
+        </svg>
+        <span id="progressText">0 / 0 reviewed</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Java Interview Reference</div>
+      <h1>Every question your<br>interviewer will<span class="accent"> compile()</span>.</h1>
+      <p class="lede">A single-file, no-fluff reference covering OOP, Collections internals, Concurrency, Java 8+ Streams, JVM memory and more — built for the night before the interview.</p>
+      <div class="hero-stats">
+        <div class="stat"><b id="statTopics">11</b><span>Topics</span></div>
+        <div class="stat"><b id="statQuestions">0</b><span>Questions</span></div>
+        <div class="stat"><b>2</b><span>Tiers</span></div>
+      </div>
+      <div class="hero-ctas">
+        <a href="#topics" class="btn btn-primary">Start reviewing ↓</a>
+        <a href="https://sourabh562.github.io/sourabhnaneriyaportfolio" target="_blank" rel="noopener" class="btn btn-ghost">View my portfolio →</a>
+      </div>
+    </div>
+    <div class="term">
+      <div class="term-bar">
+        <span class="dots"><span class="t1"></span><span class="t2"></span><span class="t3"></span></span>
+        <span class="fname">~/interview-prep — zsh</span>
+      </div>
+      <div class="term-body" id="termBody"></div>
+    </div>
+  </div>
+</section>
+
+<div class="layout" id="topics">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Topics</div>
+    <nav id="sidebarNav"></nav>
+  </aside>
+
+  <main>
+    <div class="content-header">
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Search 90+ questions — e.g. HashMap, volatile, flatMap...">
+          <span class="kbd">/</span>
+        </div>
+      </div>
+      <div class="filter-chips" id="filterChips">
+        <button class="chip active" data-filter="all">All topics</button>
+        <button class="chip" data-filter="T1">🔥 Tier 1 — Must know</button>
+        <button class="chip" data-filter="T2">🟡 Tier 2 — Very important</button>
+      </div>
+      <div class="results-note" id="resultsNote"></div>
+    </div>
+
+    <div id="topicsContainer"></div>
+    <div class="no-results" id="noResults">No questions match that search. Try a different keyword.</div>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Java Interview Prep<span>Curated and built by Sourabh Naneriya</span></div>
+      <div class="footer-links">
+        <a href="https://sourabh562.github.io/sourabhnaneriyaportfolio" target="_blank" rel="noopener">Portfolio</a>
+        <a href="#topics">Back to top ↑</a>
+      </div>
+    </div>
+    <div class="footer-tag">// compiled with care in Indore, India</div>
+  </div>
+</footer>
+
+<script>
+const DATA = [
+  {id:"oop", file:"OOP.java", title:"OOP", tier:"T1", items:[
+    ["Encapsulation","Wrapping data (fields) and the methods that operate on it into a single unit (class), restricting direct access via <code>private</code> fields and exposing controlled access through public getters/setters. Protects internal state and enables validation."],
+    ["Inheritance","A subclass acquires the fields and methods of a superclass using <code>extends</code>, enabling code reuse and polymorphic behavior. Java supports single inheritance for classes."],
+    ["Polymorphism","The ability of an object to take many forms — achieved via method overriding (runtime/dynamic binding) and overloading (compile-time/static binding). The same interface produces different behavior depending on the actual object type."],
+    ["Abstraction","Hiding implementation details and exposing only essential features, achieved via abstract classes and interfaces. It focuses on 'what' an object does rather than 'how' it does it."],
+    ["Overloading vs Overriding","Overloading: same method name with a different parameter list, resolved at compile time, allowed within the same class. Overriding: a subclass redefines a superclass method with the exact same signature, resolved at runtime."],
+    ["this vs super","<code>this</code> refers to the current object instance — used to access current class members or call another constructor of the same class. <code>super</code> refers to the immediate parent class — used to access parent members or call the parent constructor."],
+    ["final vs static","<code>final</code> prevents modification: a final variable can't be reassigned, a final method can't be overridden, a final class can't be extended. <code>static</code> belongs to the class rather than an instance — shared across all objects and accessible without instantiation."],
+    ["Abstract class vs Interface","An abstract class can hold both abstract and concrete methods, constructors, and instance state, and supports single inheritance. An interface (Java 8+) can have default/static methods but is meant purely as a contract, and supports multiple inheritance of type."],
+    ["Composition vs Inheritance","Composition ('has-a') builds objects by combining other objects as fields, giving loose coupling and flexibility. Inheritance ('is-a') is tighter coupling — 'favor composition over inheritance' is a common principle to avoid fragile base-class problems."]
+  ]},
+  {id:"strings", file:"Strings.java", title:"String", tier:"T1", items:[
+    ["String immutability","Once created, a String's internal character data can never change — any 'modification' produces a brand-new object. This enables safe sharing, pooling, and thread safety without synchronization."],
+    ["String Pool","A special area of the heap where string literals are cached ('interned') so identical literals share a single reference, saving memory and allowing fast <code>==</code> comparisons for literals."],
+    ["== vs .equals()","<code>==</code> compares references (memory addresses); <code>.equals()</code> compares actual content. Two literals with the same value usually share a pool reference (<code>==</code> true), but <code>new String()</code> always creates a distinct heap object (<code>==</code> false)."],
+    ["String vs StringBuilder vs StringBuffer","String is immutable. StringBuilder is mutable and not thread-safe — fast for single-threaded concatenation. StringBuffer is mutable and thread-safe (synchronized methods), but slower because of that locking overhead."],
+    ["intern()","Returns the canonical pooled representation of a string, adding it to the String Pool if not already present — lets heap-created strings be forced to share a pool reference."],
+    ["String concatenation / output gotchas","Using <code>+</code> repeatedly inside a loop creates many intermediate String objects, since the compiler only optimizes simple compile-time constant concatenation — prefer StringBuilder in loops. Classic trick questions test reference equality after mixing literal and variable concatenation."]
+  ]},
+  {id:"collections", file:"Collections.java", title:"Collections", tier:"T1", items:[
+    ["List vs Set vs Map","List: ordered, allows duplicates, index-based access. Set: no duplicates, mostly unordered (except LinkedHashSet/TreeSet). Map: key-value pairs where keys are unique and values may repeat."],
+    ["ArrayList vs LinkedList","ArrayList is backed by a resizable array — O(1) random access but O(n) insert/delete in the middle (shifting elements). LinkedList is a doubly linked list — O(1) insert/delete at the ends but O(n) random access, plus higher per-node memory overhead."],
+    ["HashMap vs LinkedHashMap vs TreeMap","HashMap: no ordering guarantee, O(1) average access, allows one null key. LinkedHashMap: maintains insertion (or access) order via an internal linked list. TreeMap: sorted by natural order or a Comparator, O(log n) operations, backed by a Red-Black tree, no null keys."],
+    ["HashSet vs LinkedHashSet vs TreeSet","These mirror the Map variants above because each is internally backed by the corresponding Map — HashSet by a HashMap, LinkedHashSet by a LinkedHashMap, TreeSet by a TreeMap — carrying the same ordering and performance trade-offs."],
+    ["HashMap internal working","Backed by an array of buckets. A key's <code>hashCode()</code> is hashed/spread and modded against the array length to find a bucket index. Collisions within a bucket are stored as a linked list — or, from Java 8+, converted to a Red-Black tree once a bucket exceeds 8 entries. The map resizes (doubles capacity) once the load factor, default 0.75, is exceeded."],
+    ["HashSet internal working","Internally backed by a HashMap — every added element becomes a key, paired with a constant dummy object as the value. Uniqueness therefore relies on exactly the same hashCode/equals bucketing logic used by HashMap."],
+    ["ConcurrentHashMap","A thread-safe map built for high concurrency. From Java 8+ it uses fine-grained locking — CAS operations plus synchronized blocks on individual bucket head nodes — instead of locking the entire map like the legacy Hashtable, allowing concurrent reads and much better write throughput."],
+    ["Iterator / ListIterator","Iterator gives forward-only traversal and element removal, and works across all Collections. ListIterator (List-only) additionally supports backward traversal, element replacement via <code>set()</code>, and tracking the current index."],
+    ["Fail-fast vs fail-safe","Fail-fast iterators (ArrayList, HashMap) throw ConcurrentModificationException if the collection is structurally modified mid-iteration, detected via an internal modCount check. Fail-safe iterators (ConcurrentHashMap, CopyOnWriteArrayList) iterate over a snapshot or clone and tolerate concurrent modification."],
+    ["Comparable vs Comparator","Comparable's <code>compareTo()</code> defines a class's single natural ordering, implemented inside the class itself. Comparator's <code>compare()</code> defines external, pluggable ordering strategies — letting the same objects be sorted in multiple different ways without touching the class."],
+    ["Queue / PriorityQueue / Deque","Queue is a FIFO structure. PriorityQueue orders elements by natural order or a Comparator using a binary heap internally — not FIFO, the head is always the smallest/highest-priority element. Deque is a double-ended queue that supports insertion and removal from both ends, and can act as either a Stack or a Queue."]
+  ]},
+  {id:"exceptions", file:"Exceptions.java", title:"Exception Handling", tier:"T1", items:[
+    ["Checked vs unchecked","Checked exceptions (extend Exception, not RuntimeException) must be declared or handled at compile time, e.g. IOException. Unchecked exceptions (extend RuntimeException) aren't compiler-enforced and usually signal a programming bug, e.g. NullPointerException."],
+    ["throw vs throws","<code>throw</code> actually raises a specific exception instance at a point in code. <code>throws</code> is a method-signature clause declaring which checked exceptions that method might propagate to its caller."],
+    ["try-catch-finally","<code>try</code> wraps risky code, <code>catch</code> handles a specific exception type, and <code>finally</code> always runs afterward for cleanup — regardless of whether an exception occurred — unless the JVM itself exits."],
+    ["Custom exceptions","Created by extending Exception (checked) or RuntimeException (unchecked) to represent a domain-specific error condition with a meaningful name and any extra context fields you need."],
+    ["Exception hierarchy","Everything descends from Throwable, which splits into Error (serious JVM-level problems not meant to be caught, e.g. OutOfMemoryError) and Exception (recoverable), which itself splits into checked exceptions and the unchecked RuntimeException branch."],
+    ["Try-with-resources","A try statement that automatically closes any resource implementing AutoCloseable at the end of the block — even if an exception is thrown — removing the need for manual cleanup in a finally block."]
+  ]},
+  {id:"concurrency", file:"Concurrency.java", title:"Multithreading & Concurrency", tier:"T1", items:[
+    ["Thread lifecycle","New → Runnable → Running → (Blocked / Waiting / Timed Waiting) → Terminated. Transitions are driven by the scheduler, synchronization, and calls like <code>start()</code>, <code>wait()</code>, <code>sleep()</code>, or the run() method completing."],
+    ["Thread vs Runnable vs Callable","Extending Thread ties you to single inheritance and overrides <code>run()</code>. Implementing Runnable is generally preferred — no return value, no checked exceptions — since it decouples the task from the thread and leaves the class free to extend something else. Callable is like Runnable but returns a value and can throw checked exceptions, used with ExecutorService."],
+    ["start() vs run()","<code>start()</code> creates a brand-new call stack/thread and eventually invokes <code>run()</code> on it, giving real concurrency. Calling <code>run()</code> directly just executes it as an ordinary method on the current thread — no new thread is created."],
+    ["sleep() vs wait() vs join()","<code>sleep()</code> pauses the current thread for a fixed time without releasing any lock. <code>wait()</code>, called on an object's monitor, releases the lock and pauses until notified. <code>join()</code> makes the calling thread wait until the target thread finishes execution."],
+    ["synchronized","A keyword ensuring only one thread can execute a block or method on a given object's monitor lock at a time, preventing race conditions on shared mutable state."],
+    ["volatile","Guarantees visibility of a variable's latest value across threads by forcing reads and writes to go to main memory instead of thread-local caches. It does not provide atomicity for compound operations like increment."],
+    ["Atomic classes","Classes such as AtomicInteger and AtomicLong (java.util.concurrent.atomic) provide lock-free, thread-safe operations on a single variable using CAS (Compare-And-Swap) hardware instructions — faster than synchronized for simple counters."],
+    ["ExecutorService","A higher-level framework that manages a pool of worker threads, letting you submit Runnable/Callable tasks without manually creating and managing Thread objects — it handles reuse, queuing, and shutdown for you."],
+    ["Future vs CompletableFuture","Future represents a pending async result — you can only block on <code>get()</code> to retrieve it, with no chaining or manual completion. CompletableFuture extends this with non-blocking callbacks (<code>thenApply</code>, <code>thenCombine</code>), chaining, and combining multiple async computations."],
+    ["Deadlock","Occurs when two or more threads each hold a lock the other needs, and both wait forever — commonly caused by acquiring multiple locks in inconsistent order. Prevented with consistent lock ordering, timeouts, or higher-level concurrency utilities."],
+    ["Race condition","Occurs when multiple threads access or modify shared data concurrently without proper synchronization, so the final outcome depends on unpredictable thread scheduling and timing."],
+    ["Producer-Consumer","A classic concurrency pattern where producer threads generate data into a shared buffer/queue and consumer threads process it, coordinated via wait/notify or a BlockingQueue to handle full and empty buffer states safely."]
+  ]},
+  {id:"java8", file:"Java8.java", title:"Java 8+", tier:"T1", items:[
+    ["Lambda expressions","A concise anonymous-function syntax, <code>(params) -> body</code>, implementing a functional interface — enabling functional-style code without verbose anonymous inner classes."],
+    ["Functional Interface","An interface with exactly one abstract method (optionally marked with <code>@FunctionalInterface</code>), making it a valid target type for a lambda expression or method reference."],
+    ["Predicate / Function / Consumer / Supplier","Predicate&lt;T&gt;: takes T, returns boolean (<code>test</code>). Function&lt;T,R&gt;: takes T, returns R (<code>apply</code>). Consumer&lt;T&gt;: takes T, returns nothing (side effect). Supplier&lt;T&gt;: takes nothing, returns T (produces/lazily supplies a value)."],
+    ["Method reference","Shorthand, <code>ClassName::method</code>, for a lambda whose body just calls an existing method — improves readability when the lambda is a single method call."],
+    ["Optional","A container object that may or may not hold a non-null value, used as a return type to explicitly signal 'this value might be absent' and avoid scattered null checks and NullPointerExceptions."],
+    ["Stream API","A pipeline abstraction over a data source supporting functional-style, often lazily-evaluated operations (<code>map</code>, <code>filter</code>, <code>reduce</code>, etc.) to process collections declaratively instead of with manual loops."],
+    ["map() vs flatMap()","<code>map()</code> transforms each element 1:1, keeping the same overall shape — which can leave you with a stream of streams for nested collections. <code>flatMap()</code> transforms and then flattens nested structures into a single-level stream."],
+    ["filter()","An intermediate stream operation that keeps only the elements matching a given Predicate, discarding everything else."],
+    ["reduce()","A terminal operation that combines all stream elements into a single result using an associative accumulator function — e.g. summing values or finding a maximum."],
+    ["collect()","A terminal operation that gathers stream elements into a different form — a List, Set, Map, String, etc. — using a Collector such as <code>Collectors.toList()</code>."],
+    ["forEach()","A terminal operation that performs an action on each stream element, primarily for side effects — it has no return value."],
+    ["Parallel streams","Streams that split their source into chunks processed across multiple threads via the common ForkJoinPool, potentially speeding up large computations at the cost of ordering guarantees and being unsafe with shared mutable state."]
+  ]},
+  {id:"jvm", file:"JVM.java", title:"JVM & Memory", tier:"T2", items:[
+    ["Stack vs Heap","The Stack stores method call frames, local variables, and object references — it's thread-private and follows LIFO with automatic cleanup on method return. The Heap stores actual objects and is shared across all threads, managed by the Garbage Collector."],
+    ["Java Memory Model","Defines how threads interact through shared memory — specifying visibility and ordering rules for reads/writes via 'happens-before' relationships. It's exactly why keywords like volatile and synchronized matter for correctness."],
+    ["Garbage Collection","The automatic reclamation of heap memory occupied by objects no longer reachable from any GC root, built around the generational hypothesis that most objects die young — sparing developers from manual memory management."],
+    ["G1 / ZGC basics","G1 (Garbage First) divides the heap into regions and prioritizes collecting the regions with the most garbage first, aiming for predictable pause times. ZGC is a low-latency collector built for very large heaps, achieving sub-millisecond pauses using colored pointers and load barriers."],
+    ["Memory leaks","In Java, a leak happens when objects stay unintentionally reachable — through static collections, unclosed resources, or lingering listener references — so the GC can never reclaim them, gradually exhausting heap memory."],
+    ["OutOfMemoryError","A JVM Error thrown when a memory area (heap, or Metaspace, etc.) can't allocate more objects even after garbage collection — often caused by a leak, though sometimes just an undersized heap."],
+    ["Object creation","Objects are typically created via <code>new</code> (heap allocation plus constructor call), but can also be created without <code>new</code> — through reflection, cloning, or deserialization — all still routed through the JVM's underlying object-creation machinery."],
+    ["Reference types","Java defines four reference strengths that affect GC eligibility: Strong (never collected while reachable), Soft (collected only under memory pressure — good for caches), Weak (collected at the very next GC cycle, e.g. WeakHashMap), and Phantom (used to track post-finalization cleanup)."]
+  ]},
+  {id:"equalshash", file:"EqualsHashCode.java", title:"equals() & hashCode()", tier:"T2", items:[
+    ["The contract between them","If two objects are equal per <code>equals()</code>, they must return the same <code>hashCode()</code> — the reverse isn't required, since unequal objects can legally share a hash code. Overriding only one of the pair breaks hash-based collections."],
+    ["Why HashMap/HashSet depend on them","<code>hashCode()</code> decides which bucket an entry lands in, and <code>equals()</code> checks for an exact match within that bucket — for both lookups and duplicate detection — so custom key classes must override both correctly and consistently."],
+    ["What happens on a hash code collision","Entries that land in the same bucket but have different actual values are stored together — as a linked list, or a tree once a bucket in Java 8+ grows large enough — and <code>equals()</code> is used to distinguish between them during lookup."]
+  ]},
+  {id:"generics", file:"Generics.java", title:"Generics", tier:"T2", items:[
+    ["Generic classes/methods","Let classes and methods operate on a type parameter — e.g. <code>class Box&lt;T&gt;</code> — specified at the point of use, giving compile-time type safety without duplicating code for every type."],
+    ["Wildcards","The <code>?</code> symbol represents an unknown type in generic code, used when the exact type parameter doesn't matter — only its bounds do."],
+    ["? extends","An upper-bounded wildcard accepting T or any subtype. The collection becomes effectively read-only ('producer') since the compiler can't guarantee which exact subtype is safe to insert."],
+    ["? super","A lower-bounded wildcard accepting T or any supertype. The collection is write-friendly ('consumer') since any T, or subtype of T, can safely be added."],
+    ["Type safety & erasure","Generics let the compiler catch type mismatches at compile time instead of failing at runtime with a ClassCastException. Under the hood, generic type information is erased at runtime ('type erasure') once those checks have passed."]
+  ]},
+  {id:"immutability", file:"Immutability.java", title:"Immutability", tier:"T2", items:[
+    ["How to build an immutable class","Make the class <code>final</code>, all fields <code>private final</code>, provide no setters, fully initialize state via the constructor, and return defensive copies of any mutable fields (arrays, collections, dates) from getters."],
+    ["Why String is immutable","For security (safe use in class loading and network connections), thread safety without synchronization, safe hashcode caching for use as HashMap keys, and safe sharing through the String Pool."],
+    ["Benefits of immutable objects","Inherently thread-safe with no synchronization needed, safe to share and cache freely, simpler to reason about since no defensive copying is required at call sites, and safe as Map keys or Set elements since their hash code never changes."],
+    ["Immutable vs mutable objects","Immutable objects can't change state after construction — any 'modification' returns a new object. Mutable objects can change state in place, which is more efficient for frequent updates but riskier to share across threads."]
+  ]},
+  {id:"serialization", file:"Serialization.java", title:"Serialization", tier:"T2", items:[
+    ["Serializable","A marker interface with no methods — indicating that a class's objects can be converted to a byte stream (serialized) and reconstructed later (deserialized), typically for persistence or transfer over a network."],
+    ["transient","A field modifier that excludes that field from the default serialization process — useful for sensitive data like passwords, or for fields that simply aren't serializable, like a Thread or a Socket."],
+    ["Serialization / deserialization","Serialization converts an object's state into a byte stream via ObjectOutputStream. Deserialization reconstructs the object from that stream via ObjectInputStream, restoring field values directly rather than calling a constructor."],
+    ["Object creation without new","Deserialization builds objects by reading a byte stream and restoring field state directly, without invoking any constructor — which is why classes need a stable serialVersionUID, and why this is a well-known way to bypass constructor logic, relevant to Singleton-breaking discussions."]
+  ]}
+];
+
+// ---------- render sidebar + topics ----------
+const sidebarNav = document.getElementById('sidebarNav');
+const topicsContainer = document.getElementById('topicsContainer');
+let totalQuestions = 0;
+
+DATA.forEach((topic, ti) => {
+  totalQuestions += topic.items.length;
+
+  // sidebar link
+  const link = document.createElement('a');
+  link.className = 'file-link';
+  link.href = '#topic-' + topic.id;
+  link.dataset.target = topic.id;
+  link.innerHTML = `<span class="fdot ${topic.tier}"></span><span class="fname">${topic.file}</span><span class="fcount">${topic.items.length}</span>`;
+  sidebarNav.appendChild(link);
+
+  // topic section
+  const section = document.createElement('section');
+  section.className = 'topic';
+  section.id = 'topic-' + topic.id;
+  section.dataset.tier = topic.tier;
+
+  const tierLabel = topic.tier === 'T1' ? 'TIER 1' : 'TIER 2';
+
+  const head = document.createElement('div');
+  head.className = 'topic-head';
+  head.innerHTML = `
+    <span class="dots"><span style="background:var(--red)"></span><span style="background:var(--yellow)"></span><span style="background:var(--green)"></span></span>
+    <span class="num">${String(ti+1).padStart(2,'0')}</span>
+    <h2>${topic.file}</h2>
+    <span class="tier-badge ${topic.tier}">${tierLabel}</span>
+  `;
+  section.appendChild(head);
+
+  const progBar = document.createElement('div');
+  progBar.className = 'topic-progress';
+  progBar.innerHTML = '<i></i>';
+  section.appendChild(progBar);
+
+  topic.items.forEach(([q,a], qi) => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.q = q.toLowerCase();
+    item.dataset.a = a.replace(/<[^>]+>/g,'').toLowerCase();
+
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <span class="check" role="checkbox" aria-checked="false" tabindex="0" aria-label="Mark reviewed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+      </span>
+      <div class="q-main"><p class="q-text">${q}</p></div>
+      <span class="chev"></span>
+    `;
+    const answer = document.createElement('div');
+    answer.className = 'answer';
+    answer.innerHTML = `<div class="answer-inner">${a}</div>`;
+
+    row.querySelector('.q-main').addEventListener('click', () => toggleOpen(item, answer));
+    row.querySelector('.chev').addEventListener('click', () => toggleOpen(item, answer));
+    const chk = row.querySelector('.check');
+    chk.addEventListener('click', (e) => { e.stopPropagation(); toggleDone(item); });
+    chk.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleDone(item);} });
+
+    item.appendChild(row);
+    item.appendChild(answer);
+    section.appendChild(item);
+  });
+
+  topicsContainer.appendChild(section);
+
+  if(topic.id === 'java8'){
+    section.appendChild(buildStreamOpsPanel());
+  }
+});
+
+function buildStreamOpsPanel(){
+  const panel = document.createElement('div');
+  panel.className = 'stream-panel';
+  panel.innerHTML = `
+    <p class="stream-panel-title">Stream API — operator types</p>
+    <div class="stream-pipeline">
+      <span class="pstep src">source .stream()</span>
+      <span class="arrow">→</span>
+      <span class="pstep inter">intermediate</span>
+      <span class="arrow">→</span>
+      <span class="pstep inter">intermediate</span>
+      <span class="arrow">→</span>
+      <span class="pstep term">terminal → result</span>
+    </div>
+    <div class="op-cols">
+      <div class="op-col inter">
+        <div class="op-col-head"><span class="swatch"></span><b>Intermediate</b><small>lazy · returns a Stream</small></div>
+        <div class="op-pills">
+          <span class="op-pill">map()</span>
+          <span class="op-pill">flatMap()</span>
+          <span class="op-pill">filter()</span>
+          <span class="op-pill">sorted()</span>
+          <span class="op-pill">distinct()</span>
+          <span class="op-pill">limit()</span>
+          <span class="op-pill">skip()</span>
+          <span class="op-pill">peek()</span>
+        </div>
+        <p class="op-note">Don't execute anything by themselves — each call just builds up the pipeline. Nothing runs until a terminal operation is invoked (lazy evaluation).</p>
+      </div>
+      <div class="op-col term">
+        <div class="op-col-head"><span class="swatch"></span><b>Terminal</b><small>eager · triggers execution</small></div>
+        <div class="op-pills">
+          <span class="op-pill">collect()</span>
+          <span class="op-pill">reduce()</span>
+          <span class="op-pill">forEach()</span>
+          <span class="op-pill">count()</span>
+          <span class="op-pill">anyMatch()</span>
+          <span class="op-pill">allMatch()</span>
+          <span class="op-pill">noneMatch()</span>
+          <span class="op-pill">findFirst()</span>
+          <span class="op-pill">findAny()</span>
+          <span class="op-pill">toArray()</span>
+        </div>
+        <p class="op-note">Kick off actual processing of the pipeline and produce a result or side effect. A stream can only have <b style="color:var(--text)">one</b> terminal operation — it's consumed afterward and can't be reused.</p>
+      </div>
+    </div>
+  `;
+  return panel;
+}
+
+document.getElementById('statQuestions').textContent = totalQuestions;
+document.getElementById('statTopics').textContent = DATA.length;
+updateGlobalProgress();
+
+function toggleOpen(item, answerEl){
+  const isOpen = item.classList.contains('open');
+  if(isOpen){
+    item.classList.remove('open');
+    answerEl.style.maxHeight = null;
+  } else {
+    item.classList.add('open');
+    answerEl.style.maxHeight = answerEl.scrollHeight + 'px';
+  }
+}
+
+function toggleDone(item){
+  item.classList.toggle('done');
+  const section = item.closest('.topic');
+  updateTopicProgress(section);
+  updateGlobalProgress();
+}
+
+function updateTopicProgress(section){
+  const items = section.querySelectorAll('.item');
+  const done = section.querySelectorAll('.item.done').length;
+  const pct = items.length ? Math.round((done/items.length)*100) : 0;
+  section.querySelector('.topic-progress i').style.width = pct + '%';
+}
+
+function updateGlobalProgress(){
+  const all = document.querySelectorAll('.item').length;
+  const done = document.querySelectorAll('.item.done').length;
+  document.getElementById('progressText').textContent = `${done} / ${all} reviewed`;
+  const r = document.getElementById('ringFg');
+  const circumference = 50.24;
+  const pct = all ? done/all : 0;
+  r.style.strokeDashoffset = (circumference - circumference*pct).toFixed(2);
+}
+
+// ---------- search + filter ----------
+const searchInput = document.getElementById('searchInput');
+const filterChips = document.querySelectorAll('.chip');
+const resultsNote = document.getElementById('resultsNote');
+const noResults = document.getElementById('noResults');
+let activeTier = 'all';
+
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  let visibleTotal = 0;
+
+  document.querySelectorAll('.topic').forEach(section => {
+    const tierOk = activeTier === 'all' || section.dataset.tier === activeTier;
+    let topicHasMatch = false;
+
+    section.querySelectorAll('.item').forEach(item => {
+      const matches = !q || item.dataset.q.includes(q) || item.dataset.a.includes(q);
+      const show = tierOk && matches;
+      item.style.display = show ? '' : 'none';
+      if(show){ topicHasMatch = true; visibleTotal++; }
+      // reset open state highlighting is left as-is
+    });
+
+    section.style.display = topicHasMatch ? '' : 'none';
+    const linkEl = document.querySelector(`.file-link[data-target="${section.id.replace('topic-','')}"]`);
+    if(linkEl) linkEl.style.display = topicHasMatch ? '' : 'none';
+  });
+
+  if(q || activeTier !== 'all'){
+    resultsNote.textContent = `Showing ${visibleTotal} of ${totalQuestions} questions`;
+  } else {
+    resultsNote.textContent = '';
+  }
+  noResults.style.display = visibleTotal === 0 ? 'block' : 'none';
+}
+
+searchInput.addEventListener('input', applyFilters);
+document.addEventListener('keydown', (e) => {
+  if(e.key === '/' && document.activeElement !== searchInput){
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+filterChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    filterChips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeTier = chip.dataset.filter;
+    applyFilters();
+  });
+});
+
+// ---------- sidebar active link on scroll ----------
+const sections = Array.from(document.querySelectorAll('.topic'));
+const links = Array.from(document.querySelectorAll('.file-link'));
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+    }
+    if(entry.isIntersecting && entry.intersectionRatio > 0.15){
+      links.forEach(l => l.classList.remove('active'));
+      const active = links.find(l => l.dataset.target === entry.target.id.replace('topic-',''));
+      if(active) active.classList.add('active');
+    }
+  });
+}, {threshold: [0.15, 0.3], rootMargin: '-80px 0px -50% 0px'});
+sections.forEach(s => io.observe(s));
+
+// ---------- mobile drawer ----------
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const burger = document.getElementById('burger');
+function openDrawer(){ sidebar.classList.add('show'); overlay.classList.add('show'); }
+function closeDrawer(){ sidebar.classList.remove('show'); overlay.classList.remove('show'); }
+burger.addEventListener('click', () => sidebar.classList.contains('show') ? closeDrawer() : openDrawer());
+overlay.addEventListener('click', closeDrawer);
+links.forEach(l => l.addEventListener('click', closeDrawer));
+
+// ---------- terminal typing effect ----------
+const termBody = document.getElementById('termBody');
+const termScript = [
+  {text: '$ javac InterviewPrep.java', cls:'p', pause:280},
+  {text: 'Compiling 11 topics ...', cls:'', pause:260},
+  {text: `Resolving ${totalQuestions} questions ...`, cls:'', pause:300},
+  {text: 'Linking Collections.class, Concurrency.class, Java8.class ...', cls:'', pause:340},
+  {text: 'BUILD SUCCESSFUL in 0.4s', cls:'ok', pause:400},
+  {text: '', cls:'', pause:120},
+  {text: '$ run --candidate=you --confidence=high', cls:'p', pause:0}
+];
+
+function typeLine(line, cb){
+  const p = document.createElement('p');
+  p.className = 'term-line' + (line.cls ? ' ' + line.cls : '');
+  termBody.appendChild(p);
+  let i = 0;
+  const text = line.text;
+  if(!text){ cb(); return; }
+  const speed = 14;
+  function step(){
+    p.textContent = text.slice(0, i);
+    i++;
+    if(i <= text.length){
+      setTimeout(step, speed);
+    } else {
+      setTimeout(cb, line.pause);
+    }
+  }
+  step();
+}
+
+function runTerminal(idx){
+  if(idx >= termScript.length){
+    const cur = document.createElement('span');
+    cur.className = 'cursor';
+    termBody.appendChild(cur);
+    return;
+  }
+  typeLine(termScript[idx], () => runTerminal(idx+1));
+}
+runTerminal(0);
+
+// ---------- custom cursor ----------
+const finePointer = window.matchMedia('(pointer: fine)').matches;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(finePointer && !reduceMotion){
+  document.body.classList.add('custom-cursor');
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mx = -100, my = -100, rx = -100, ry = -100;
+  window.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  });
+  (function raf(){
+    rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(raf);
+  })();
+  const hoverables = 'a, button, .chip, .check, .item-row, .file-link, .search-box';
+  document.addEventListener('mouseover', (e) => {
+    if(e.target.closest(hoverables)) ring.classList.add('hover');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if(e.target.closest(hoverables)) ring.classList.remove('hover');
+  });
+  document.addEventListener('mouseleave', () => { dot.style.opacity = '0'; ring.style.opacity = '0'; });
+  document.addEventListener('mouseenter', () => { dot.style.opacity = '1'; ring.style.opacity = '1'; });
+}
+</script>
+</body>
+</html>
