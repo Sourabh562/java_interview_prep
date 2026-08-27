@@ -112,10 +112,8 @@ a{color:inherit;}
   max-width:1360px; margin:0 auto; padding:14px 24px;
   display:flex; align-items:center; gap:18px; justify-content:space-between;
 }
-.brand{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:.2px; white-space:nowrap;}
-.brand .dot-cluster{display:flex; gap:5px;}
-.brand .dot-cluster span{width:9px; height:9px; border-radius:50%; display:inline-block;}
-.brand .d1{background:var(--red);} .brand .d2{background:var(--yellow);} .brand .d3{background:var(--green);}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:.2px; white-space:nowrap; min-width:0;}
+.brand-logo{width:150px; height:72px; object-fit:contain; flex:0 0 150px; display:block;}
 .brand small{color:var(--text-mute); font-weight:500; font-size:11px;}
 
 .top-actions{display:flex; align-items:center; gap:14px;}
@@ -439,6 +437,9 @@ footer{border-top:1px solid var(--border-soft); background:var(--bg-alt); paddin
 }
 @media (max-width:600px){
   .wrap, .topbar-inner, .layout{padding-left:16px; padding-right:16px;}
+  .brand{gap:10px; font-size:13px;}
+  .brand-logo{width:125px; height:62px; flex-basis:125px;}
+  .brand small{font-size:10px;}
   .hero{padding:40px 0 28px;}
   .hero-stats{gap:20px;}
   .stat b{font-size:22px;}
@@ -471,8 +472,7 @@ footer{border-top:1px solid var(--border-soft); background:var(--bg-alt); paddin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
     <div class="brand">
-      <span class="dot-cluster"><span class="d1"></span><span class="d2"></span><span class="d3"></span></span>
-      JavaPrep<small>.dev</small>
+      <img class="brand-logo" src="java_logo.png" alt="Java logo">
     </div>
     <div class="top-actions">
       <button class="quiz-trigger" id="quizTriggerTop">
